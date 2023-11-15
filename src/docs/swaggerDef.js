@@ -18,11 +18,11 @@ const swaggerDef = {
       name: "MIT",
       url: "https://github.com/obinnafranklinduru/guessing_game/blob/main/LICENSE",
     },
-    "host": BASE_URL,
+    "host": `${BASE_URL}/docs`,
   },
   servers: [
     {
-      url: `http://localhost:${PORT}`,
+      url: BASE_URL,
     },
   ],
 };
