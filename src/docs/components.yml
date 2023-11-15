@@ -1,0 +1,52 @@
+components:
+  schemas:
+    PayloadData:
+      type: object
+      properties:
+        ID:
+          type: number
+        Amount:
+          type: number
+        Currency:
+          type: string
+        CustomerEmail:
+          type: string
+          format: email
+        SplitInfo:
+          type: array
+      example:
+        ID: 1308
+        Amount: 12580
+        Currency: "NGN"
+        CustomerEmail: "anon8@customers.io"
+        SplitInfo:
+          [
+            {
+              "SplitType": "FLAT",
+              "SplitValue": 45,
+              "SplitEntityId": "SCRACC0019",
+            },
+          ]
+
+    PaymentSplitterResponse:
+      type: object
+      properties:
+        ID:
+          type: number
+        Balance:
+          type: number
+        SplitBreakdown:
+          type: array
+      example:
+        ID: 1308
+        Balance: 12535
+        SplitBreakdown: [{ "SplitEntityId": "SCRACC0019", "Amount": 45 }]
+
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: false
+        message:
+          type: string

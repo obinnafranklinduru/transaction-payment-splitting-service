@@ -1,0 +1,15 @@
+{
+  "apps": [
+    {
+      "name": "app",
+      "script": "src/server.js",
+      "instances": "max",
+      "autorestart": true,
+      "watch": false,
+      "time": true,
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  ]
+}
