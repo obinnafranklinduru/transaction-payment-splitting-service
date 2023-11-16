@@ -10,17 +10,17 @@ const ErrorResponse = require('../utils/errorResponse');
  */
 async function computePaymentSplitting(req, res, next) {
     try {
-        // Extract relevant details from the request body
         const { ID, Amount, Currency, CustomerEmail, SplitInfo } = req.body;
 
+        // Cache the order of split types
+        const order = ['FLAT', 'PERCENTAGE', 'RATIO'];
+
         // Sort SplitInfo based on precedence rules
-        const sortedSplitInfo = SplitInfo.sort((a, b) => {
-            const order = ['FLAT', 'PERCENTAGE', 'RATIO'];
-            return order.indexOf(a.SplitType) - order.indexOf(b.SplitType);
-        });
+        const sortedSplitInfo = SplitInfo.sort((a, b) => order.indexOf(a.SplitType) - order.indexOf(b.SplitType));
 
         let balance = Amount;
         const splitBreakdown = [];
+        let totalRatio = 0;
 
         // Iterate through each split entity and calculate the split amount
         for (const { SplitType, SplitValue, SplitEntityId } of sortedSplitInfo) {
@@ -34,21 +34,18 @@ async function computePaymentSplitting(req, res, next) {
                     amount = Math.min((SplitValue / 100) * balance, balance);
                     break;
                 case 'RATIO':
-                    const totalRatio = sortedSplitInfo
-                        .filter((info) => info.SplitType === 'RATIO')
-                        .reduce((acc, curr) => acc + curr.SplitValue, 0);
-
-                    const openingRatioBalance = balance;
-                    amount = Math.min((SplitValue / totalRatio) * openingRatioBalance, openingRatioBalance);
+                    if (totalRatio === 0) {
+                        totalRatio = sortedSplitInfo.filter((info) => info.SplitType === 'RATIO').reduce((acc, curr) => acc + curr.SplitValue, 0);
+                    }
+                    amount = Math.min((SplitValue / totalRatio) * balance, balance);
                     break;
                 default:
-                    // Handle invalid SplitType
                     next(new ErrorResponse('Invalid SplitType', 400));
             }
 
             // Record the split breakdown
             splitBreakdown.push({ SplitEntityId, Amount: amount });
-            
+
             // Update the balance for the next iteration
             balance -= amount;
         }
