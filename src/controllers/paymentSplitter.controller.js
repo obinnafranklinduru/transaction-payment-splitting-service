@@ -77,6 +77,7 @@ async function computePaymentSplitting(req, res, next) {
             SplitBreakdown: splitBreakdown,
         });
     } catch (error) {
+        console.error(error.message)
         next(error);
     }
 }
